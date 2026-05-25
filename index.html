@@ -231,6 +231,28 @@
 </footer>
 
 <script>
+/* BUILD VERSION - auto-updated on each deploy */
+const BUILD_VERSION = "1779739277";
+
+/* ── Update check: force hard reload if new version deployed ── */
+(function checkUpdate(){
+  const stored = localStorage.getItem("pbz-build");
+  if (stored && stored !== BUILD_VERSION) {
+    // New version detected: clear all caches then reload
+    if ("caches" in window) {
+      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
+        localStorage.setItem("pbz-build", BUILD_VERSION);
+        location.reload(true);
+      });
+    } else {
+      localStorage.setItem("pbz-build", BUILD_VERSION);
+      location.reload(true);
+    }
+    return;
+  }
+  localStorage.setItem("pbz-build", BUILD_VERSION);
+})();
+
 const CATEGORIES = [
   { id:"inland",     label:"Inlandpolitik", icon:"\uD83C\uDFDB\uFE0F", accent:"#2dd4a0", bg:"#0d2e25" },
   { id:"soziales",   label:"Soziales",      icon:"\uD83E\uDD1D", accent:"#4ab3f4", bg:"#0d1e2e" },
@@ -478,25 +500,6 @@ renderMain(); loadCategory("inland");
   const blob = new Blob([JSON.stringify(manifest)], {type:"application/manifest+json"});
   document.getElementById("pwa-manifest").href = URL.createObjectURL(blob);
 
-  /* ── 4. Service Worker (offline cache) ── */
-  if("serviceWorker" in navigator){
-    const sw=`
-      const CACHE="pbz-v1";
-      self.addEventListener("install",e=>{
-        e.waitUntil(caches.open(CACHE).then(c=>c.addAll(["."])));
-        self.skipWaiting();
-      });
-      self.addEventListener("activate",e=>{
-        e.waitUntil(caches.keys().then(keys=>Promise.all(keys.filter(k=>k!==CACHE).map(k=>caches.delete(k)))));
-        self.clients.claim();
-      });
-      self.addEventListener("fetch",e=>{
-        e.respondWith(fetch(e.request).catch(()=>caches.match(e.request)));
-      });
-    `;
-    const swBlob=new Blob([sw],{type:"application/javascript"});
-    navigator.serviceWorker.register(URL.createObjectURL(swBlob));
-  }
 })();
 </script>
 </body>
