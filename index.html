@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Der Polit-Beipackzettel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=IBM+Plex+Sans:wght@300;400;500&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet"/>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg:    #0c0c0a;
+    --bg2:   #0a0a08;
+    --bg3:   #111210;
+    --border:#252520;
+    --text:  #eaeae2;
+    --muted: #a0a096;
+    --dim:   #7a7a70;
+    --vdim:  #6a6a60;
+  }
+  html { scroll-behavior: smooth; }
+  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  ::-webkit-scrollbar { width:3px; }
+  ::-webkit-scrollbar-track { background:var(--bg); }
+  ::-webkit-scrollbar-thumb { background:#2a2a22; border-radius:2px; }
+
+  body::before {
+    content:''; position:fixed; inset:0;
+    background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);
+    pointer-events:none; z-index:9999;
+  }
+
+  #site-header {
+    background:var(--bg2); border-bottom:1px solid var(--border);
+    padding:0 20px; position:sticky; top:0; z-index:200;
+    animation:slideDown .45s ease both;
+  }
+  .topbar {
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 0 7px; border-bottom:1px solid #1c1c18;
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#b0b0a4;
+  }
+  .topbar .live { color:#2dd4a0; display:flex; align-items:center; gap:5px; }
+  .live-dot { width:5px; height:5px; border-radius:50%; background:#2dd4a0; animation:blink 2s ease infinite; }
+
+  .title-row { padding:14px 0 11px; display:flex; align-items:flex-end; gap:14px; }
+  .title-group h1 {
+    font-family:'Playfair Display',serif; font-weight:900;
+    font-size:clamp(22px,5vw,32px); letter-spacing:-.02em; color:var(--text); line-height:1;
+  }
+  .title-group h1 span { color:#2dd4a0; }
+  .slogan { margin-top:5px; font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.1em; color:#b0b0a4; }
+
+  .header-meta {
+    font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.1em;
+    text-align:right; line-height:1.9; color:#a0a096;
+  }
+  .header-meta .meta-active { color:#2dd4a0; }
+
+  .tab-nav { display:flex; gap:0; margin-bottom:-1px; overflow-x:auto; scrollbar-width:none; }
+  .tab-nav::-webkit-scrollbar { display:none; }
+  .tab-btn {
+    background:none; border:none; cursor:pointer; padding:10px 14px 11px;
+    font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#7a7a70;
+    border-bottom:2px solid transparent; transition:color .15s, border-color .15s;
+    display:flex; align-items:center; gap:6px; white-space:nowrap; flex-shrink:0;
+  }
+  .tab-btn .tab-icon { font-size:14px; }
+  .tab-btn.active { color:var(--accent); border-bottom-color:var(--accent); }
+  .tab-btn .load-dot { width:5px; height:5px; border-radius:50%; background:var(--accent); display:none; animation:blink .8s ease infinite; }
+  .tab-btn.loading .load-dot { display:inline-block; }
+
+  main { max-width:940px; margin:0 auto; padding:24px 16px 56px; }
+
+  .cat-block {
+    background:var(--bg3); border:1px solid color-mix(in srgb,var(--accent) 12%,transparent);
+    border-radius:3px; overflow:hidden; animation:fadeIn .3s ease both;
+  }
+  .cat-header {
+    padding:13px 18px; display:flex; align-items:center; gap:9px;
+    border-bottom:1px solid color-mix(in srgb,var(--accent) 14%,transparent);
+  }
+  .cat-header-icon { font-size:17px; }
+  .cat-header-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.15em; color:var(--accent); font-weight:700; }
+  .cat-status-dot { width:6px; height:6px; border-radius:50%; background:var(--accent); box-shadow:0 0 7px var(--accent); margin-left:auto; }
+  .cat-status-dot.loading { background:#f4c44a; box-shadow:0 0 7px #f4c44a; animation:blink .9s ease infinite; }
+
+  .cards-wrap { padding:14px; display:flex; flex-direction:column; gap:10px; }
+
+  .skeleton {
+    height:72px; background:color-mix(in srgb,var(--accent) 5%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 8%,transparent);
+    border-radius:2px; animation:shimmer 1.4s ease infinite;
+  }
+
+  .news-card {
+    background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,#0a0a08) 0%,rgba(255,255,255,.02) 100%);
+    border:1px solid color-mix(in srgb,var(--accent) 16%,transparent);
+    border-radius:3px; padding:16px 18px; cursor:pointer; position:relative;
+    transition:border-color .2s, box-shadow .2s, transform .18s;
+    animation:fadeIn .4s ease both;
+  }
+  .news-card:hover { border-color:color-mix(in srgb,var(--accent) 40%,transparent); transform:translateY(-1px); box-shadow:0 6px 20px color-mix(in srgb,var(--accent) 10%,transparent); }
+  .news-card.open  { border-color:color-mix(in srgb,var(--accent) 33%,transparent); box-shadow:0 0 20px color-mix(in srgb,var(--accent) 12%,transparent); }
+
+  .card-accent-line { position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); opacity:.25; transition:opacity .2s; }
+  .news-card.open .card-accent-line { opacity:1; }
+
+  .card-top { display:flex; justify-content:space-between; align-items:flex-start; gap:10px; }
+  .card-headline { font-family:'Playfair Display',serif; font-size:15px; font-weight:700; color:var(--text); line-height:1.35; flex:1; }
+  .card-toggle { color:var(--accent); font-size:22px; flex-shrink:0; line-height:1; transition:transform .2s; }
+  .news-card.open .card-toggle { transform:rotate(45deg); }
+  .card-teaser { margin-top:9px; font-size:13px; color:var(--muted); line-height:1.55; }
+
+  .card-body { margin-top:14px; padding-top:14px; border-top:1px solid color-mix(in srgb,var(--accent) 14%,transparent); display:none; animation:expandIn .2s ease both; }
+  .news-card.open .card-body { display:block; }
+
+  .bedeutung-box {
+    background:color-mix(in srgb,var(--accent) 6%,transparent);
+    border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+    border-radius:2px; padding:11px 13px; margin-bottom:11px;
+  }
+  .bedeutung-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--accent); margin-bottom:6px; }
+  .bedeutung-text  { font-size:13px; color:#d4d4cc; line-height:1.6; }
+  .card-meta { display:flex; justify-content:space-between; align-items:center; gap:8px; flex-wrap:wrap; }
+  .card-source { font-family:'Space Mono',monospace; font-size:11px; color:var(--dim); }
+  .trust-badge { display:flex; align-items:center; gap:5px; font-family:'Space Mono',monospace; font-size:11px; flex-shrink:0; }
+  .trust-dot { width:7px; height:7px; border-radius:50%; }
+
+  .teaser-grid { margin-top:24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:9px; }
+  .teaser-card {
+    background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,#0c0c0a) 0%,var(--bg3) 100%);
+    border:1px solid color-mix(in srgb,var(--accent) 12%,transparent);
+    border-radius:3px; padding:14px 15px; cursor:pointer; text-align:left;
+    transition:border-color .18s, transform .15s; animation:fadeIn .45s ease both; width:100%;
+  }
+  .teaser-card:hover { border-color:color-mix(in srgb,var(--accent) 35%,transparent); transform:translateY(-1px); }
+  .teaser-card-top  { display:flex; align-items:center; gap:7px; margin-bottom:7px; }
+  .teaser-card-icon { font-size:14px; }
+  .teaser-card-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--accent); }
+  .teaser-card-text  { font-size:12px; color:#7a7a6e; line-height:1.45; }
+
+  footer {
+    border-top:1px solid #1e1e1a; padding:18px 20px;
+    display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;
+    font-family:'Space Mono',monospace; font-size:10px; color:var(--vdim); letter-spacing:.08em;
+  }
+
+  @keyframes fadeIn    { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
+  @keyframes expandIn  { from{opacity:0;transform:scaleY(.93);transform-origin:top} to{opacity:1;transform:scaleY(1)} }
+  @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:.2} }
+  @keyframes shimmer   { 0%,100%{opacity:.35} 50%{opacity:.65} }
+  @keyframes slideDown { from{opacity:0;transform:translateY(-12px)} to{opacity:1;transform:translateY(0)} }
+
+  @media (max-width:480px) {
+    .topbar { font-size:9px; }
+    .tab-btn { padding:9px 7px 10px; gap:4px; }
+    .tab-btn .tab-label { font-size:10px; letter-spacing:.04em; }
+    .tab-btn .tab-icon  { font-size:13px; }
+    main { padding:16px 12px 48px; }
+    .teaser-grid { grid-template-columns:1fr 1fr; }
+    footer { flex-direction:column; gap:4px; font-size:9px; }
+  }
+  @media (max-width:360px) { .teaser-grid { grid-template-columns:1fr; } }
+</style>
+</head>
+<body>
+
+<header id="site-header">
+  <div class="topbar">
+    <span id="kw-label">WOCHENPOLITIK</span>
+    <span class="live"><span class="live-dot"></span>LIVE ANALYSE</span>
+  </div>
+  <div class="title-row">
+    <div class="title-group">
+      <h1>Der Polit-<span>Beipackzettel</span></h1>
+      <p class="slogan">DAS VOLK HAFTET F&#220;R RISIKEN &amp; NEBENWIRKUNGEN</p>
+    </div>
+    <div style="flex:1"></div>
+    <div class="header-meta">
+      <div>QUELLEN-CHECK</div>
+      <div class="meta-active">AKTIV</div>
+    </div>
+  </div>
+  <nav class="tab-nav" id="tab-nav"></nav>
+</header>
+
+<main>
+  <div id="active-block"></div>
+  <div class="teaser-grid" id="teaser-grid"></div>
+</main>
+
+<footer>
+  <span>DER POLIT-BEIPACKZETTEL</span>
+  <span>DAS VOLK HAFTET F&#220;R RISIKEN &amp; NEBENWIRKUNGEN</span>
+</footer>
+
+<script>
+const CATEGORIES = [
+  { id:"inland",     label:"Inlandpolitik", icon:"\uD83C\uDFDB\uFE0F", accent:"#2dd4a0", bg:"#0d2e25" },
+  { id:"soziales",   label:"Soziales",      icon:"\uD83E\uDD1D", accent:"#4ab3f4", bg:"#0d1e2e" },
+  { id:"gesundheit", label:"Gesundheit",    icon:"\u2695\uFE0F", accent:"#f44ab3", bg:"#2e0d1e" },
+  { id:"wirtschaft", label:"Wirtschaft",    icon:"\uD83D\uDCCA", accent:"#b3f44a", bg:"#1e2e0d" },
+];
+const SEED = {
+  inland: [
+    { id:1, headline:"Bundesregierung beschlie\u00DFt Sicherheitspaket", teaser:"Neue Ma\u00DFnahmen zur inneren Sicherheit passieren das Kabinett nach wochenlangen Verhandlungen.", bedeutung:"Strengere Grenzkontrollen und erweiterte Beh\u00F6rdenbefugnisse \u2013 betrifft Einreise, Asylverfahren und Datenspeicherung aller B\u00FCrger.", quelle:"Bundesministerium des Innern", vertrauen:92 },
+    { id:2, headline:"Reform des Wahlrechts: Bundestag stimmt ab", teaser:"Kontroverse Verkleinerung des Parlaments auf 630 Sitze tritt in Kraft.", bedeutung:"Weniger Abgeordnete = weniger direkte Vertretung pro Wahlkreis. Deine Stimme wird rechnerisch anders gewichtet.", quelle:"Deutscher Bundestag", vertrauen:95 },
+  ],
+  soziales: [
+    { id:3, headline:"B\u00FCrgergeld-Anpassung: Neue Regelss\u00E4tze", teaser:"Sozialleistungen steigen um 4,2 % \u2013 Opposition kritisiert Umsetzung als unzureichend.", bedeutung:"Rund 5,5 Mio. Empf\u00E4nger erhalten ~17 \u20AC mehr pro Monat. Inflationsbereinigt bleibt der Realwert nahezu konstant.", quelle:"BMAS / Statistisches Bundesamt", vertrauen:88 },
+    { id:4, headline:"Wohnungsnot: Neubau-Ziele verfehlt", teaser:"400.000 Wohnungen geplant \u2013 nur 230.000 fertiggestellt. Regierung \u00FCberpr\u00FCft F\u00F6rderprogramme.", bedeutung:"Mieten in Ballungsr\u00E4umen steigen weiter. Besonders Familien mit mittlerem Einkommen sind betroffen.", quelle:"Bundesbauministerium / Destatis", vertrauen:91 },
+  ],
+  gesundheit: [
+    { id:5, headline:"Krankenhausreform: Letzte Beratungsstufe", teaser:"Lauterbach-Reform soll Klinikstrukturen neu ordnen \u2013 Bundesl\u00E4nder widersprechen.", bedeutung:"Kleinere Kliniken drohen zu schlie\u00DFen. L\u00E4ngere Anfahrtswege zu Notaufnahmen f\u00FCr Millionen m\u00F6glich.", quelle:"BMG / GKV-Spitzenverband", vertrauen:87 },
+    { id:6, headline:"GKV-Beitrag steigt erneut", teaser:"Gesetzliche Krankenkassen erh\u00F6hen Zusatzbeitr\u00E4ge auf durchschnittlich 1,9 %.", bedeutung:"Arbeitnehmer mit 3.500 \u20AC brutto zahlen ~8 \u20AC mehr monatlich \u2013 Jahresbelastung ca. 96 \u20AC.", quelle:"GKV-Spitzenverband", vertrauen:94 },
+  ],
+  wirtschaft: [
+    { id:7, headline:"Inflation auf 2,3 % gesunken", teaser:"Statistisches Bundesamt meldet Entspannung \u2013 Energie bleibt Preistreiber.", bedeutung:"Kaufkraft stabilisiert sich. Reallohnzuw\u00E4chse m\u00F6glich, wenn Tarifabschl\u00FCsse 2\u20133 % \u00FCberschreiten.", quelle:"Statistisches Bundesamt", vertrauen:97 },
+    { id:8, headline:"Insolvenzwelle im Mittelstand", teaser:"+22 % Firmenpleiten gegen\u00FCber Vorjahr \u2013 Bau und Handel am h\u00E4rtesten getroffen.", bedeutung:"Drohender Anstieg der Arbeitslosigkeit in strukturschwachen Regionen. Kurzarbeit als Puffer wird ausgeweitet.", quelle:"Creditreform / Destatis", vertrauen:90 },
+  ],
+};
+
+let activeTab="inland";
+const aiData={}, loaded=new Set(), loading=new Set();
+
+(function(){
+  const now=new Date(), start=new Date(now.getFullYear(),0,1);
+  const week=Math.ceil(((now-start)/86400000+start.getDay()+1)/7);
+  document.getElementById("kw-label").textContent="WOCHENPOLITIK KW "+week+" \u00B7 "+now.getFullYear();
+})();
+
+function trustColor(s){ return s>=90?"#2dd4a0":s>=80?"#f4c44a":"#f44a4a"; }
+function setCSSAccent(el,a){ el.style.setProperty("--accent",a); }
+
+function renderCard(item,cat,delay){
+  const card=document.createElement("div");
+  card.className="news-card"; card.style.animationDelay=delay+"ms";
+  setCSSAccent(card,cat.accent);
+  card.innerHTML=`
+    <div class="card-accent-line"></div>
+    <div class="card-top">
+      <div class="card-headline">${item.headline}</div>
+      <div class="card-toggle">+</div>
+    </div>
+    <p class="card-teaser">${item.teaser}</p>
+    <div class="card-body">
+      <div class="bedeutung-box">
+        <div class="bedeutung-label">\u26A0 WAS DAS BEDEUTET</div>
+        <div class="bedeutung-text">${item.bedeutung}</div>
+      </div>
+      <div class="card-meta">
+        <span class="card-source">${item.quelle}</span>
+        <span class="trust-badge">
+          <span class="trust-dot" style="background:${trustColor(item.vertrauen)};box-shadow:0 0 6px ${trustColor(item.vertrauen)}"></span>
+          <span style="color:${trustColor(item.vertrauen)};font-weight:700">${item.vertrauen}%</span>
+        </span>
+      </div>
+    </div>`;
+  card.addEventListener("click",()=>card.classList.toggle("open"));
+  return card;
+}
+
+function renderCategoryBlock(cat,items,isLoading){
+  const block=document.createElement("div");
+  block.className="cat-block"; setCSSAccent(block,cat.accent);
+  block.style.background=`linear-gradient(180deg,color-mix(in srgb,${cat.accent} 4%,#111210) 0%,#111210 40%)`;
+  const header=document.createElement("div");
+  header.className="cat-header";
+  header.style.background=`linear-gradient(90deg,${cat.bg} 0%,#111210 100%)`;
+  header.innerHTML=`<span class="cat-header-icon">${cat.icon}</span><span class="cat-header-label">${cat.label.toUpperCase()}</span><div class="cat-status-dot${isLoading?" loading":""}"></div>`;
+  block.appendChild(header);
+  const wrap=document.createElement("div"); wrap.className="cards-wrap";
+  if(isLoading){ wrap.innerHTML='<div class="skeleton"></div><div class="skeleton"></div>'; }
+  else{ items.forEach((item,idx)=>wrap.appendChild(renderCard(item,cat,idx*70))); }
+  block.appendChild(wrap);
+  return block;
+}
+
+function renderTeaserCard(cat,text,delay){
+  const btn=document.createElement("button");
+  btn.className="teaser-card"; btn.style.animationDelay=delay+"ms"; setCSSAccent(btn,cat.accent);
+  btn.innerHTML=`<div class="teaser-card-top"><span class="teaser-card-icon">${cat.icon}</span><span class="teaser-card-label">${cat.label.toUpperCase()}</span></div><p class="teaser-card-text">${text?text.slice(0,75)+(text.length>75?"\u2026":""):"Wird geladen\u2026"}</p>`;
+  btn.addEventListener("click",()=>switchTab(cat.id));
+  return btn;
+}
+
+function renderTabs(){
+  const nav=document.getElementById("tab-nav"); nav.innerHTML="";
+  CATEGORIES.forEach(cat=>{
+    const btn=document.createElement("button");
+    btn.className="tab-btn"+(cat.id===activeTab?" active":"")+(loading.has(cat.id)?" loading":"");
+    btn.style.setProperty("--accent",cat.accent);
+    btn.innerHTML=`<span class="tab-icon">${cat.icon}</span><span class="tab-label">${cat.label.toUpperCase()}</span><span class="load-dot"></span>`;
+    btn.addEventListener("click",()=>switchTab(cat.id));
+    nav.appendChild(btn);
+  });
+}
+
+function renderMain(){
+  const cat=CATEGORIES.find(c=>c.id===activeTab);
+  const items=aiData[activeTab]||SEED[activeTab];
+  const ab=document.getElementById("active-block"); ab.innerHTML="";
+  ab.appendChild(renderCategoryBlock(cat,items,loading.has(activeTab)));
+  const tg=document.getElementById("teaser-grid"); tg.innerHTML="";
+  CATEGORIES.filter(c=>c.id!==activeTab).forEach((c,i)=>{
+    const preview=aiData[c.id]?.[0]?.teaser||SEED[c.id]?.[0]?.teaser||"";
+    tg.appendChild(renderTeaserCard(c,preview,i*60));
+  });
+  renderTabs();
+}
+
+function switchTab(id){
+  if(id===activeTab) return; activeTab=id; renderMain(); loadCategory(id);
+}
+
+async function loadCategory(catId){
+  if(loaded.has(catId)||loading.has(catId)) return;
+  loading.add(catId); renderMain();
+  const cat=CATEGORIES.find(c=>c.id===catId);
+  const prompt=`Du bist Redakteur f\u00FCr "Der Polit-Beipackzettel". Erstelle 2 aktuelle Nachrichtenmeldungen f\u00FCr die Kategorie: "${cat.label}". Jede Meldung als JSON-Objekt mit: id (vierstellige Zufallszahl als Zahl), headline (max 12 W\u00F6rter), teaser (max 2 S\u00E4tze), bedeutung (was bedeutet das konkret f\u00FCr die Bev\u00F6lkerung, 1-2 S\u00E4tze), quelle (glaubw\u00FCrdige deutsche Beh\u00F6rde/Institution), vertrauen (Zahl 0-100). Antworte NUR mit einem JSON-Array, ohne Markdown-Wrapper, ohne Pr\u00E4ambel.`;
+  try {
+    const res=await fetch("https://api.anthropic.com/v1/messages",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:prompt}]})});
+    const data=await res.json();
+    const text=(data.content||[]).map(b=>b.text||"").join("");
+    const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
+    if(Array.isArray(parsed)&&parsed.length) aiData[catId]=parsed;
+  } catch(e){}
+  loading.delete(catId); loaded.add(catId); renderMain();
+}
+
+renderMain(); loadCategory("inland");
+</script>
+</body>
+</html>
