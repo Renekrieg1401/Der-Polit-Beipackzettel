@@ -28,14 +28,25 @@
     --dim:   #7a7a70;
     --vdim:  #6a6a60;
   }
-  html { scroll-behavior: smooth; }
-  body { background:var(--bg); color:var(--text); font-family:'IBM Plex Sans',sans-serif; min-height:100vh; overflow-x:hidden; }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  body {
+    background:var(--bg); color:var(--text);
+    font-family:'IBM Plex Sans',sans-serif;
+    min-height:100vh; min-height:100dvh;
+    overflow-x:hidden;
+    -webkit-font-smoothing:antialiased;
+    -moz-osx-font-smoothing:grayscale;
+  }
   ::-webkit-scrollbar { width:3px; }
   ::-webkit-scrollbar-track { background:var(--bg); }
   ::-webkit-scrollbar-thumb { background:#2a2a22; border-radius:2px; }
 
   body::before {
-    content:''; position:fixed; inset:0;
+    content:''; position:fixed; top:0; left:0; right:0; bottom:0;
     background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);
     pointer-events:none; z-index:9999;
   }
@@ -46,12 +57,10 @@
     animation:slideDown .45s ease both;
   }
   .topbar {
-    display:flex; justify-content:space-between; align-items:center;
+    display:flex; justify-content:flex-start; align-items:center;
     padding:8px 0 7px; border-bottom:1px solid #1c1c18;
     font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#b0b0a4;
   }
-  .topbar .live { color:#2dd4a0; display:flex; align-items:center; gap:5px; }
-  .live-dot { width:5px; height:5px; border-radius:50%; background:#2dd4a0; animation:blink 2s ease infinite; }
 
   .title-row { padding:14px 0 11px; display:flex; align-items:flex-end; gap:14px; }
   .title-group h1 {
@@ -70,7 +79,8 @@
   .tab-nav { display:flex; gap:0; margin-bottom:-1px; overflow-x:auto; scrollbar-width:none; }
   .tab-nav::-webkit-scrollbar { display:none; }
   .tab-btn {
-    background:none; border:none; cursor:pointer; padding:10px 14px 11px;
+    background:none; border:none; cursor:pointer;
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation; padding:10px 14px 11px;
     font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.1em; color:#7a7a70;
     border-bottom:2px solid transparent; transition:color .15s, border-color .15s;
     display:flex; align-items:center; gap:6px; white-space:nowrap; flex-shrink:0;
@@ -83,12 +93,12 @@
   main { max-width:940px; margin:0 auto; padding:24px 16px 56px; }
 
   .cat-block {
-    background:var(--bg3); border:1px solid color-mix(in srgb,var(--accent) 12%,transparent);
+    background:var(--bg3); border:1px solid var(--ac12);
     border-radius:3px; overflow:hidden; animation:fadeIn .3s ease both;
   }
   .cat-header {
     padding:13px 18px; display:flex; align-items:center; gap:9px;
-    border-bottom:1px solid color-mix(in srgb,var(--accent) 14%,transparent);
+    border-bottom:1px solid var(--ac14);
   }
   .cat-header-icon { font-size:17px; }
   .cat-header-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.15em; color:var(--accent); font-weight:700; }
@@ -98,20 +108,21 @@
   .cards-wrap { padding:14px; display:flex; flex-direction:column; gap:10px; }
 
   .skeleton {
-    height:72px; background:color-mix(in srgb,var(--accent) 5%,transparent);
-    border:1px solid color-mix(in srgb,var(--accent) 8%,transparent);
+    height:72px; background:var(--ac05);
+    border:1px solid var(--ac08);
     border-radius:2px; animation:shimmer 1.4s ease infinite;
   }
 
   .news-card {
-    background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 8%,#0a0a08) 0%,rgba(255,255,255,.02) 100%);
-    border:1px solid color-mix(in srgb,var(--accent) 16%,transparent);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    background:linear-gradient(135deg,var(--ac08dark) 0%,rgba(255,255,255,.02) 100%);
+    border:1px solid var(--ac16);
     border-radius:3px; padding:16px 18px; cursor:pointer; position:relative;
     transition:border-color .2s, box-shadow .2s, transform .18s;
     animation:fadeIn .4s ease both;
   }
-  .news-card:hover { border-color:color-mix(in srgb,var(--accent) 40%,transparent); transform:translateY(-1px); box-shadow:0 6px 20px color-mix(in srgb,var(--accent) 10%,transparent); }
-  .news-card.open  { border-color:color-mix(in srgb,var(--accent) 33%,transparent); box-shadow:0 0 20px color-mix(in srgb,var(--accent) 12%,transparent); }
+  .news-card:hover { border-color:var(--ac40); transform:translateY(-1px); box-shadow:0 6px 20px var(--ac10); }
+  .news-card.open  { border-color:var(--ac33); box-shadow:0 0 20px var(--ac12); }
 
   .card-accent-line { position:absolute; top:0; left:0; right:0; height:2px; background:linear-gradient(90deg,var(--accent),transparent); opacity:.25; transition:opacity .2s; }
   .news-card.open .card-accent-line { opacity:1; }
@@ -122,12 +133,12 @@
   .news-card.open .card-toggle { transform:rotate(45deg); }
   .card-teaser { margin-top:9px; font-size:13px; color:var(--muted); line-height:1.55; }
 
-  .card-body { margin-top:14px; padding-top:14px; border-top:1px solid color-mix(in srgb,var(--accent) 14%,transparent); display:none; animation:expandIn .2s ease both; }
+  .card-body { margin-top:14px; padding-top:14px; border-top:1px solid var(--ac14); display:none; animation:expandIn .2s ease both; }
   .news-card.open .card-body { display:block; }
 
   .bedeutung-box {
-    background:color-mix(in srgb,var(--accent) 6%,transparent);
-    border:1px solid color-mix(in srgb,var(--accent) 20%,transparent);
+    background:var(--ac06);
+    border:1px solid var(--ac20);
     border-radius:2px; padding:11px 13px; margin-bottom:11px;
   }
   .bedeutung-label { font-family:'Space Mono',monospace; font-size:10px; letter-spacing:.12em; color:var(--accent); margin-bottom:6px; }
@@ -164,12 +175,13 @@
 
   .teaser-grid { margin-top:24px; display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:9px; }
   .teaser-card {
-    background:linear-gradient(135deg,color-mix(in srgb,var(--accent) 10%,#0c0c0a) 0%,var(--bg3) 100%);
-    border:1px solid color-mix(in srgb,var(--accent) 12%,transparent);
+    -webkit-tap-highlight-color:transparent; touch-action:manipulation;
+    background:linear-gradient(135deg,var(--ac10dark) 0%,var(--bg3) 100%);
+    border:1px solid var(--ac12);
     border-radius:3px; padding:14px 15px; cursor:pointer; text-align:left;
     transition:border-color .18s, transform .15s; animation:fadeIn .45s ease both; width:100%;
   }
-  .teaser-card:hover { border-color:color-mix(in srgb,var(--accent) 35%,transparent); transform:translateY(-1px); }
+  .teaser-card:hover { border-color:var(--ac35); transform:translateY(-1px); }
   .teaser-card-top  { display:flex; align-items:center; gap:7px; margin-bottom:7px; }
   .teaser-card-icon { font-size:14px; }
   .teaser-card-label { font-family:'Space Mono',monospace; font-size:9px; letter-spacing:.12em; color:var(--accent); }
@@ -204,7 +216,7 @@
 <header id="site-header">
   <div class="topbar">
     <span id="kw-label">WOCHENPOLITIK</span>
-    <span class="live"><span class="live-dot"></span>LIVE ANALYSE</span>
+    
   </div>
   <div class="title-row">
     <div class="title-group">
@@ -300,7 +312,30 @@ const aiData={}, loaded=new Set(), loading=new Set();
 })();
 
 function trustColor(s){ return s>=90?"#2dd4a0":s>=80?"#f4c44a":"#f44a4a"; }
-function setCSSAccent(el,a){ el.style.setProperty("--accent",a); }
+function hexToRgb(h){
+  const x=h.replace('#','');
+  const n=parseInt(x,16);
+  return [(n>>16)&255,(n>>8)&255,n&255];
+}
+function setCSSAccent(el,a){
+  const [r,g,b]=hexToRgb(a);
+  el.style.setProperty("--accent",a);
+  el.style.setProperty("--ac04dark","rgba("+r+","+g+","+b+",0.06)");
+  el.style.setProperty("--ac05","rgba("+r+","+g+","+b+",0.05)");
+  el.style.setProperty("--ac06","rgba("+r+","+g+","+b+",0.06)");
+  el.style.setProperty("--ac08","rgba("+r+","+g+","+b+",0.08)");
+  el.style.setProperty("--ac08dark","rgba("+r+","+g+","+b+",0.12)");
+  el.style.setProperty("--ac10","rgba("+r+","+g+","+b+",0.10)");
+  el.style.setProperty("--ac10dark","rgba("+r+","+g+","+b+",0.12)");
+  el.style.setProperty("--ac12","rgba("+r+","+g+","+b+",0.12)");
+  el.style.setProperty("--ac14","rgba("+r+","+g+","+b+",0.14)");
+  el.style.setProperty("--ac16","rgba("+r+","+g+","+b+",0.16)");
+  el.style.setProperty("--ac20","rgba("+r+","+g+","+b+",0.20)");
+  el.style.setProperty("--ac25","rgba("+r+","+g+","+b+",0.25)");
+  el.style.setProperty("--ac33","rgba("+r+","+g+","+b+",0.33)");
+  el.style.setProperty("--ac35","rgba("+r+","+g+","+b+",0.35)");
+  el.style.setProperty("--ac40","rgba("+r+","+g+","+b+",0.40)");
+}
 
 function renderCard(item,cat,delay){
   const card=document.createElement("div");
@@ -344,7 +379,7 @@ function renderCard(item,cat,delay){
 function renderCategoryBlock(cat,items,isLoading){
   const block=document.createElement("div");
   block.className="cat-block"; setCSSAccent(block,cat.accent);
-  block.style.background=`linear-gradient(180deg,color-mix(in srgb,${cat.accent} 4%,#111210) 0%,#111210 40%)`;
+  block.style.background=`linear-gradient(180deg,var(--ac04dark) 0%,#111210 40%)`;
   const header=document.createElement("div");
   header.className="cat-header";
   header.style.background=`linear-gradient(90deg,${cat.bg} 0%,#111210 100%)`;
@@ -394,8 +429,26 @@ function switchTab(id){
   if(id===activeTab) return; activeTab=id; renderMain(); loadCategory(id);
 }
 
+function getWeekKey(){
+  const now=new Date(), s=new Date(now.getFullYear(),0,1);
+  const w=Math.ceil(((now-s)/86400000+s.getDay()+1)/7);
+  return now.getFullYear()+"-W"+w;
+}
+
 async function loadCategory(catId){
   if(loaded.has(catId)||loading.has(catId)) return;
+
+  /* ── Weekly cache check ── */
+  const wk=getWeekKey();
+  const cachedWeek=localStorage.getItem("pbz-wk-"+catId);
+  const cachedData=localStorage.getItem("pbz-dt-"+catId);
+  if(cachedWeek===wk && cachedData){
+    try{
+      const parsed=JSON.parse(cachedData);
+      if(Array.isArray(parsed)&&parsed.length){ aiData[catId]=parsed; loaded.add(catId); renderMain(); return; }
+    }catch(e){}
+  }
+
   loading.add(catId); renderMain();
   const cat=CATEGORIES.find(c=>c.id===catId);
   const prompt=`Du bist Redakteur f\u00FCr "Der Polit-Beipackzettel". Erstelle 5 aktuelle Nachrichtenmeldungen f\u00FCr die Kategorie: "${cat.label}". Jede Meldung als JSON-Objekt mit: id (vierstellige Zufallszahl als Zahl), headline (max 12 W\u00F6rter), teaser (max 2 S\u00E4tze), bedeutung (was bedeutet das konkret f\u00FCr die Bev\u00F6lkerung, 1-2 S\u00E4tze), quelle (glaubw\u00FCrdige deutsche Beh\u00F6rde/Institution), vertrauen (Zahl 0-100). Antworte NUR mit einem JSON-Array, ohne Markdown-Wrapper, ohne Pr\u00E4ambel.`;
@@ -404,7 +457,11 @@ async function loadCategory(catId){
     const data=await res.json();
     const text=(data.content||[]).map(b=>b.text||"").join("");
     const parsed=JSON.parse(text.replace(/```json|```/g,"").trim());
-    if(Array.isArray(parsed)&&parsed.length) aiData[catId]=parsed;
+    if(Array.isArray(parsed)&&parsed.length){
+      aiData[catId]=parsed;
+      const wk2=getWeekKey();
+      try{ localStorage.setItem("pbz-wk-"+catId,wk2); localStorage.setItem("pbz-dt-"+catId,JSON.stringify(parsed)); }catch(e){}
+    }
   } catch(e){}
   loading.delete(catId); loaded.add(catId); renderMain();
 }
@@ -503,4 +560,5 @@ renderMain(); loadCategory("inland");
 })();
 </script>
 </body>
+</html>
 </html>
