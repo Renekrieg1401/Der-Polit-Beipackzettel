@@ -193,6 +193,45 @@
     font-family:'Space Mono',monospace; font-size:10px; color:var(--vdim); letter-spacing:.08em;
   }
 
+  /* Update banner */
+  #update-banner {
+    display: none;
+    position: fixed; bottom: 0; left: 0; right: 0;
+    z-index: 9000;
+    background: #0a0a08;
+    border-top: 2px solid #2dd4a0;
+    padding: 14px 20px;
+    align-items: center; justify-content: space-between; gap: 12px;
+    animation: slideUp .35s ease both;
+    box-shadow: 0 -4px 24px rgba(45,212,160,.15);
+  }
+  #update-banner.visible { display: flex; }
+  .update-text {
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; letter-spacing: .08em;
+    color: #b0b0a4; line-height: 1.5;
+  }
+  .update-text strong { color: #2dd4a0; display: block; margin-bottom: 2px; }
+  .update-btn {
+    background: #2dd4a0; color: #0a0a08;
+    border: none; border-radius: 2px;
+    padding: 10px 18px;
+    font-family: 'Space Mono', monospace;
+    font-size: 11px; font-weight: 700; letter-spacing: .1em;
+    cursor: pointer; white-space: nowrap; flex-shrink: 0;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    transition: background .15s, transform .1s;
+  }
+  .update-btn:active { transform: scale(.97); background: #22b88a; }
+  .update-dismiss {
+    background: none; border: none; color: #5a5a52;
+    font-size: 18px; cursor: pointer; padding: 4px 8px;
+    -webkit-tap-highlight-color: transparent;
+    flex-shrink: 0;
+  }
+
+  @keyframes slideUp { from{opacity:0;transform:translateY(100%)} to{opacity:1;transform:translateY(0)} }
   @keyframes fadeIn    { from{opacity:0;transform:translateY(7px)} to{opacity:1;transform:translateY(0)} }
   @keyframes expandIn  { from{opacity:0;transform:scaleY(.93);transform-origin:top} to{opacity:1;transform:scaleY(1)} }
   @keyframes blink     { 0%,100%{opacity:1} 50%{opacity:.2} }
@@ -212,6 +251,15 @@
 </style>
 </head>
 <body>
+
+<div id="update-banner" role="alert" aria-live="polite">
+  <div class="update-text">
+    <strong>&#x21BB; NEUE VERSION</strong>
+    Aktualisierung verf&uuml;gbar
+  </div>
+  <button class="update-btn" onclick="doUpdate()">JETZT LADEN</button>
+  <button class="update-dismiss" onclick="dismissUpdate()" aria-label="Schlie&szlig;en">&times;</button>
+</div>
 
 <header id="site-header">
   <div class="topbar">
@@ -257,14 +305,28 @@ async function checkForUpdate(){
     const stored = localStorage.getItem("pbz-etag");
     localStorage.setItem("pbz-etag", tag);
     if(stored && stored !== tag){
-      /* Neue Version auf Server → alle Caches leeren + hart neu laden */
-      if("caches" in window){
-        const keys = await caches.keys();
-        await Promise.all(keys.map(k => caches.delete(k)));
-      }
-      location.reload(true);
+      /* Neue Version → Banner anzeigen statt auto-reload */
+      showUpdateBanner();
     }
-  } catch(e){ /* offline oder CORS – still ignorieren */ }
+  } catch(e){ /* offline – ignorieren */ }
+}
+
+function showUpdateBanner(){
+  const b = document.getElementById("update-banner");
+  if(b) b.classList.add("visible");
+}
+
+function doUpdate(){
+  /* Caches leeren + hart neu laden */
+  const reload = () => location.reload(true);
+  if("caches" in window){
+    caches.keys().then(keys => Promise.all(keys.map(k=>caches.delete(k)))).then(reload).catch(reload);
+  } else { reload(); }
+}
+
+function dismissUpdate(){
+  const b = document.getElementById("update-banner");
+  if(b) b.classList.remove("visible");
 }
 
 /* Beim Start prüfen */
