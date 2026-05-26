@@ -243,27 +243,37 @@
 </footer>
 
 <script>
-/* BUILD VERSION - auto-updated on each deploy */
-const BUILD_VERSION = "1779739277";
-
-/* ── Update check: force hard reload if new version deployed ── */
-(function checkUpdate(){
-  const stored = localStorage.getItem("pbz-build");
-  if (stored && stored !== BUILD_VERSION) {
-    // New version detected: clear all caches then reload
-    if ("caches" in window) {
-      caches.keys().then(keys => Promise.all(keys.map(k => caches.delete(k)))).then(() => {
-        localStorage.setItem("pbz-build", BUILD_VERSION);
-        location.reload(true);
-      });
-    } else {
-      localStorage.setItem("pbz-build", BUILD_VERSION);
+/* ═══════════════════════════════════════════
+   AUTO-UPDATE: ETag-Check gegen den Server
+   Funktioniert auch wenn die HTML selbst gecacht ist.
+   Jeder Deploy auf GitHub Pages ändert ETag/Last-Modified.
+═══════════════════════════════════════════ */
+async function checkForUpdate(){
+  if(!navigator.onLine) return;
+  try{
+    const res = await fetch(location.href, { method:"HEAD", cache:"no-store" });
+    const tag = res.headers.get("ETag") || res.headers.get("Last-Modified") || "";
+    if(!tag) return;
+    const stored = localStorage.getItem("pbz-etag");
+    localStorage.setItem("pbz-etag", tag);
+    if(stored && stored !== tag){
+      /* Neue Version auf Server → alle Caches leeren + hart neu laden */
+      if("caches" in window){
+        const keys = await caches.keys();
+        await Promise.all(keys.map(k => caches.delete(k)));
+      }
       location.reload(true);
     }
-    return;
-  }
-  localStorage.setItem("pbz-build", BUILD_VERSION);
-})();
+  } catch(e){ /* offline oder CORS – still ignorieren */ }
+}
+
+/* Beim Start prüfen */
+checkForUpdate();
+
+/* Beim Zurückkehren zur App (Hintergrund → Vordergrund) */
+document.addEventListener("visibilitychange", () => {
+  if(document.visibilityState === "visible") checkForUpdate();
+});
 
 const CATEGORIES = [
   { id:"inland",     label:"Inlandpolitik", icon:"\uD83C\uDFDB\uFE0F", accent:"#2dd4a0", bg:"#0d2e25" },
